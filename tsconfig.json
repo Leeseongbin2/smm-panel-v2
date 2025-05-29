@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ES2020",                       // ES2017 → ES2020으로 향상
+    "target": "ES2020",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "ESNext",                       // ✅ ESM 실행을 위한 핵심 설정
-    "moduleResolution": "Node",              // ✅ 'bundler' → 'Node'로 변경
+    "module": "ESNext",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
@@ -18,5 +18,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "functions"] // ✅ 여기에 추가!
 }
