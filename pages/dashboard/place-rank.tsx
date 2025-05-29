@@ -100,7 +100,7 @@ export default function PlaceRankPage() {
         history: {},
       });
 
-      const res = await fetch("http://127.0.0.1:5000", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/rank`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ keyword, mid }),
@@ -141,7 +141,7 @@ export default function PlaceRankPage() {
     setRescanLoadingIds((prev) => new Set(prev).add(item.id));
 
     try {
-      const res = await fetch("http://127.0.0.1:5000/rank", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE}/rank`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ keyword: item.keyword, mid: item.mid }),
