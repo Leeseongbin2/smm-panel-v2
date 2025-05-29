@@ -12,7 +12,6 @@ import { useUserContext } from "@/context/UserContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import dayjs, { Dayjs } from "dayjs";
 import {
-  Typography,
   Table,
   TableBody,
   TableCell,
@@ -25,9 +24,8 @@ import {
   Alert,
   Button,
   Stack,
-  useMediaQuery,
-  Box,
 } from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
