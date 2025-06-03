@@ -14,6 +14,9 @@ import {
   doc,
   updateDoc,
   addDoc,
+  getDoc,         // ✅ 추가
+  increment        // ✅ 추가
+
 } from "firebase/firestore";
 
 export default function OrderPage() {
@@ -108,13 +111,27 @@ export default function OrderPage() {
 
           alert(`✅ 주문 성공! 주문 ID: ${docRef.id}`);
 
-          if (user && user.uid) {
-            const newPoint = Math.max((userPoints || 0) - totalPrice, 0);
-            await updateDoc(doc(db, "users", user.uid), {
-              points: newPoint,
+        if (user && user.uid) {
+          const userRef = doc(db, "users", user.uid);
+          const newPoint = Math.max((userPoints || 0) - totalPrice, 0);
+          await updateDoc(userRef, { points: newPoint });
+          if (setUserPoints) setUserPoints(newPoint);
+
+          // ✅ 하위 회원 총 결제 금액 누적
+          await updateDoc(userRef, {
+            totalSpent: increment(totalPrice),
+          });
+
+          // ✅ 총판 수익 누적 (있는 경우에만)
+          const userSnap = await getDoc(userRef);
+          const userData = userSnap.data();
+          if (userData?.referrerUid) {
+            const referrerRef = doc(db, "users", userData.referrerUid);
+            await updateDoc(referrerRef, {
+              earnings: increment(Math.floor(totalPrice * 0.1)),
             });
-            if (setUserPoints) setUserPoints(newPoint);
           }
+        }
         } else {
           // ✅ 외부 API 서비스는 기존 방식 유지
           const apiEndpoint =

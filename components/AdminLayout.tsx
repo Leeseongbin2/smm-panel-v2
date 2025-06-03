@@ -5,11 +5,12 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 
 // MUI
 import AppBar from "@mui/material/AppBar";
+import CreateNewFolderIcon from '@mui/icons-material/CreateNewFolder';
+import RequestQuoteIcon from '@mui/icons-material/RequestQuote';
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
@@ -73,15 +74,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </ListItem>
 
         <ListItem disablePadding>
-          <NextLink href="/admin/userspoints" passHref legacyBehavior>
-            <ListItemButton component="a">
-              <ListItemIcon sx={{ color: "white" }}><AdminPanelSettingsIcon /></ListItemIcon>
-              <ListItemText primary="회원 포인트 현황" />
-            </ListItemButton>
-          </NextLink>
-        </ListItem>
-
-        <ListItem disablePadding>
           <NextLink href="/admin/users" passHref legacyBehavior>
             <ListItemButton component="a">
               <ListItemIcon sx={{ color: "white" }}><PeopleAltIcon /></ListItemIcon>
@@ -109,14 +101,25 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </ListItem>
 
         <ListItem disablePadding>
+          <NextLink href="/admin/withdrawals" passHref legacyBehavior>
+            <ListItemButton component="a">
+              <ListItemIcon sx={{ color: "white" }}><RequestQuoteIcon /></ListItemIcon>
+              <ListItemText primary="총판 환급관리" />
+            </ListItemButton>
+          </NextLink>
+        </ListItem>
+
+        <ListItem disablePadding>
           <NextLink href="/admin/orders" passHref legacyBehavior>
             <ListItemButton component="a">
-              <ListItemIcon sx={{ color: "white" }}><WifiFindSharpIcon /></ListItemIcon>
+              <ListItemIcon sx={{ color: "white" }}><CreateNewFolderIcon /></ListItemIcon>
               <ListItemText primary="주문 현황 관리" />
             </ListItemButton>
           </NextLink>
         </ListItem>
       </List>
+
+      
     </Box>
   );
 

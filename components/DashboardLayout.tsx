@@ -8,6 +8,7 @@ import { useUserContext } from "../context/UserContext";
 import NextLink from "next/link";
 
 // MUI
+import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -48,22 +49,24 @@ const colors = {
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = router.pathname;
-  const { userPoints, userEmail, isLoading, setUserPoints } = useUserContext();
+  const { userPoints, userEmail, isLoading, setUserPoints, user } = useUserContext();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isTrafficOpen, setIsTrafficOpen] = useState(false);
+  const [isDistributor, setIsDistributor] = useState(false); // 총판 여부 상태
 
   useEffect(() => {
-    const user = auth.currentUser;
+    const userAuth = auth.currentUser;
     if (!isLoading && !userEmail) {
       router.push("/");
       return;
     }
-    if (user && userEmail) {
-      const userRef = doc(db, "users", user.uid);
+    if (userAuth && userEmail) {
+      const userRef = doc(db, "users", userAuth.uid);
       const unsubscribe = onSnapshot(userRef, (docSnap) => {
         const data = docSnap.data();
-        if (data && typeof data.points === "number") {
-          setUserPoints(data.points);
+        if (data) {
+          if (typeof data.points === "number") setUserPoints(data.points);
+          if (data.isDistributor === true) setIsDistributor(true);
         }
       });
       return () => unsubscribe();
@@ -116,23 +119,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         <ListItem disablePadding onClick={() => setIsTrafficOpen(!isTrafficOpen)}>
           <ListItemButton onClick={() => setIsTrafficOpen(!isTrafficOpen)}
-  sx={{ pl: 3, color: colors.textPrimary }}
->
+  sx={{ pl: 3, color: colors.textPrimary }}>
             <ListItemIcon sx={{ color: "white" }}><AdsClickIcon /></ListItemIcon>
-            <ListItemText primary="트래픽" sx={{
-                  pl: 0,          // 왼쪽 padding 제거
-                  ml: -2.5,       // 왼쪽으로 당기기
-                }}
-              />
+            <ListItemText primary="트래픽" sx={{ pl: 0, ml: -2.5 }} />
             {isTrafficOpen ? <ExpandLess /> : <ExpandMore />}
           </ListItemButton>
         </ListItem>
         <Collapse in={isTrafficOpen} timeout="auto" unmountOnExit>
           <List component="div" disablePadding>
-            {[
-              { href: "/dashboard/traffic-request", label: "▶ 트래픽 신청" },
-              { href: "/dashboard/traffic-history", label: "▶ 트래픽 작업목록" }
-            ].map((sub) => (
+            {[{ href: "/dashboard/traffic-request", label: "▶ 트래픽 신청" }, { href: "/dashboard/traffic-history", label: "▶ 트래픽 작업목록" }].map((sub) => (
               <NextLink key={sub.href} href={sub.href} passHref legacyBehavior>
                 <ListItemButton
                   component="a"
@@ -144,15 +139,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </List>
         </Collapse>
 
+        {isDistributor && (
+          <ListItem disablePadding>
+            <NextLink href="/dashboard/distributor" passHref legacyBehavior>
+              <ListItemButton component="a" sx={{ pl: 3,color: colors.textPrimary, '&:hover': { bgcolor: colors.sidebarHover } }}>
+                <ListItemIcon sx={{ color: "white" }}><SupervisorAccountIcon /></ListItemIcon>
+                <ListItemText primary="총판 전용" sx={{ pl: 0, ml: -2.5 }} />
+              </ListItemButton>
+            </NextLink>
+          </ListItem>
+        )}
+
         {userEmail === adminEmail && (
           <ListItem disablePadding>
             <NextLink href="/admin" passHref legacyBehavior>
               <ListItemButton component="a" sx={{ pl: 3,color: colors.textPrimary, '&:hover': { bgcolor: colors.sidebarHover } }}>
                 <ListItemIcon sx={{ color: "white" }}><AdminPanelSettingsIcon /></ListItemIcon>
-                <ListItemText primary="관리자 페이지" sx={{
-                  pl: 0,          // 왼쪽 padding 제거
-                  ml: -2.5,       // 왼쪽으로 당기기
-                }}/>
+                <ListItemText primary="관리자 페이지" sx={{ pl: 0, ml: -2.5 }}/>
               </ListItemButton>
             </NextLink>
           </ListItem>

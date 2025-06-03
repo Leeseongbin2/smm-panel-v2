@@ -775,7 +775,11 @@ export default function Home() {
             variant="outlined"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleLogin();
+            }}
           />
+
           <TextField
             size="small"
             fullWidth
@@ -784,6 +788,9 @@ export default function Home() {
             variant="outlined"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleLogin();
+            }}
           />
           <Button
             variant="contained"
