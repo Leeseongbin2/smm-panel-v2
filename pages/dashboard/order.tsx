@@ -56,9 +56,10 @@ export default function OrderPage() {
     fetchServices();
   }, []);
 
-  const actualQuantity = customCommentIds.includes(selectedService?.serviceId?.toString())
-    ? customComments.split("\n").filter((line) => line.trim() !== "").length
-    : quantity;
+  const actualQuantity =
+    selectedService?.type === "Custom Comments"
+      ? customComments.split("\n").filter((line) => line.trim() !== "").length
+      : quantity;
 
   useEffect(() => {
     if (selectedService) {
@@ -100,7 +101,7 @@ export default function OrderPage() {
           status: "접수됨",
           createdAt: new Date(),
 
-          ...(customCommentIds.includes(selectedService.serviceId?.toString()) && {
+          ...(selectedService?.type === "Custom Comments" && {
             customData: customComments,
           }),
 
@@ -145,7 +146,8 @@ export default function OrderPage() {
               link,
               quantity: actualQuantity,
               userId: user?.uid,
-              ...(customCommentIds.includes(selectedService.serviceId?.toString()) && {
+
+              ...(selectedService?.type === "Custom Comments" && {
                 comments: customComments,
               }),
             }),
@@ -155,20 +157,21 @@ export default function OrderPage() {
 
           if (result.order) {
             // ✅ Firestore에 저장
-            const externalOrderDoc = {
-              serviceId: selectedService.serviceId,
-              provider: selectedService.provider,
-              externalOrderId: result.order,
-              link,
-              quantity: actualQuantity,
-              userId: user?.uid,
-              serviceName: selectedService.displayName, // ✅ 추가
-              status: "접수됨",
-              createdAt: new Date(),
-              ...(customCommentIds.includes(selectedService.serviceId?.toString()) && {
-                customData: customComments,
-              }),
-            };
+          const externalOrderDoc = {
+            serviceId: selectedService.serviceId,
+            provider: selectedService.provider,
+            externalOrderId: result.order,
+            link,
+            quantity: actualQuantity,
+            userId: user?.uid,
+            serviceName: selectedService.displayName,
+            status: "접수됨",
+            createdAt: new Date(),
+
+            ...(selectedService?.type === "Custom Comments" && {
+              customData: customComments,
+            }),
+          };
             await addDoc(collection(db, "orders_external"), externalOrderDoc);
 
             alert(`✅ 주문 성공! 주문 ID: ${result.order}`);
@@ -255,7 +258,7 @@ export default function OrderPage() {
 {(() => {
   const sid = selectedService?.serviceId?.toString();
 
-  if (customCommentIds.includes(sid)) {
+  if (selectedService?.type === "Custom Comments") {
     return (
       <TextField
         fullWidth

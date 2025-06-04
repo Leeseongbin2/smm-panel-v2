@@ -44,6 +44,7 @@ interface ServiceInfo {
   category: string;
   order: number;
   description?: string;
+  type?: string; // ✅ 추가
 }
 
 export default function AdminServicesPage() {
@@ -73,12 +74,18 @@ export default function AdminServicesPage() {
     };
   }, []);
 
-  const fetchServices = async () => {
-    const q = query(collection(db, "order_services"), orderBy("order"));
-    const snapshot = await getDocs(q);
-    const result: ServiceInfo[] = snapshot.docs.map((doc) => doc.data() as ServiceInfo);
-    setServices(result);
-  };
+    const fetchServices = async () => {
+      const q = query(collection(db, "order_services"), orderBy("order"));
+      const snapshot = await getDocs(q);
+      const result: ServiceInfo[] = snapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          ...data,
+          type: data.type ?? "", // smmkings만 type이 존재할 수 있으므로 안전하게 처리
+        } as ServiceInfo;
+      });
+      setServices(result);
+    };
 
   useEffect(() => {
     fetchServices();
@@ -106,18 +113,19 @@ export default function AdminServicesPage() {
 
     const data = snapshot.data();
 
-    const newDoc: ServiceInfo = {
-      uid,
-      serviceId: data.serviceId ?? 0,
-      displayName: data.displayName ?? "",
-      price: data.price ?? 0,
-      min: data.min ?? 0,
-      max: data.max ?? 0,
-      provider: provider,
-      category: categorySelector,
-      order: services.length,
-      description: data.description ?? "",
-    };
+const newDoc: ServiceInfo = {
+  uid,
+  serviceId: data.serviceId ?? 0,
+  displayName: data.displayName ?? "",
+  price: data.price ?? 0,
+  min: data.min ?? 0,
+  max: data.max ?? 0,
+  provider: provider,
+  category: categorySelector,
+  order: services.length,
+  description: data.description ?? "",
+  type: provider === "smmkings" ? data.type ?? "" : undefined, // ✅ type 필드 추가
+};
 
     await setDoc(doc(db, "order_services", uid), newDoc);
     setServices([...services, newDoc]);
