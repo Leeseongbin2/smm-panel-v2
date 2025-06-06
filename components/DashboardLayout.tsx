@@ -33,6 +33,7 @@ import BrowserUpdatedSharpIcon from "@mui/icons-material/BrowserUpdatedSharp";
 import PaidSharpIcon from "@mui/icons-material/PaidSharp";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import GroupAddIcon from '@mui/icons-material/GroupAdd';
 
 const drawerWidth = 240;
 const adminEmail = "dltjdqls9565@naver.com";
@@ -53,6 +54,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isTrafficOpen, setIsTrafficOpen] = useState(false);
   const [isDistributor, setIsDistributor] = useState(false); // 총판 여부 상태
+  const [isLoyaltyOpen, setIsLoyaltyOpen] = useState(false);
 
   useEffect(() => {
     const userAuth = auth.currentUser;
@@ -96,7 +98,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           label: "잔액충전", href: "/dashboard/charge", icon: <PaidSharpIcon />
         }, {
           label: "공지", href: "/notices", icon: <VolumeUpIcon />
-        }, {
+        },
+        {
           label: "플레이스 순위추적", href: "/dashboard/place-rank", icon: <LocationSearchingIcon />
         }].map((item) => (
           <ListItem key={item.href} disablePadding>
@@ -138,6 +141,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             ))}
           </List>
         </Collapse>
+
+        <ListItem disablePadding onClick={() => setIsLoyaltyOpen(!isLoyaltyOpen)}>
+        <ListItemButton
+          onClick={() => setIsLoyaltyOpen(!isLoyaltyOpen)}
+          sx={{ pl: 3, color: colors.textPrimary }}
+        >
+          <ListItemIcon sx={{ color: "white" }}>
+            <GroupAddIcon />
+          </ListItemIcon>
+          <ListItemText primary="단골관리" sx={{ pl: 0, ml: -2.5 }} />
+          {isLoyaltyOpen ? <ExpandLess /> : <ExpandMore />}
+        </ListItemButton>
+      </ListItem>
+      <Collapse in={isLoyaltyOpen} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          <NextLink href="/dashboard/loyalty_points" passHref legacyBehavior>
+            <ListItemButton
+              component="a"
+              sx={{ pl: 6, color: colors.textPrimary, '&:hover': { bgcolor: colors.sidebarHover } }}
+            >
+              <ListItemText primary="▶ 생성 및 포인트 관리" />
+            </ListItemButton>
+          </NextLink>
+          <NextLink href="/dashboard/loyalty_coupon" passHref legacyBehavior>
+            <ListItemButton
+              component="a"
+              sx={{ pl: 6, color: colors.textPrimary, '&:hover': { bgcolor: colors.sidebarHover } }}
+            >
+              <ListItemText primary="▶ 전체단골 및 쿠폰 관리" />
+            </ListItemButton>
+          </NextLink>
+        </List>
+      </Collapse>
 
         {isDistributor && (
           <ListItem disablePadding>
