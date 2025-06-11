@@ -9,6 +9,7 @@ import NextLink from "next/link";
 
 // MUI
 import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount";
+import BadgeIcon from '@mui/icons-material/Badge';
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -98,6 +99,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           label: "잔액충전", href: "/dashboard/charge", icon: <PaidSharpIcon />
         }, {
           label: "공지", href: "/notices", icon: <VolumeUpIcon />
+        },{
+          label: "알바관리", href: "/dashboard/employees", icon: <BadgeIcon />
         },
         {
           label: "플레이스 순위추적", href: "/dashboard/place-rank", icon: <LocationSearchingIcon />

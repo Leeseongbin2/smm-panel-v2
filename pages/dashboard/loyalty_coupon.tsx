@@ -216,8 +216,23 @@ if (sortType === "birth") {
 };
 const handleSendCoupons = async () => {
   if (!user) return;
+
   const selectedCustomers = customers.filter(c => selectedCustomerIds.includes(c.id));
 
+  // 1. 전체 비용 계산
+  const totalCost = selectedCustomers.length * 100;
+
+  // 2. 현재 보유 포인트 확인
+  const userDoc = await getDocs(collection(db, "users"));
+  const currentUserDoc = userDoc.docs.find(doc => doc.id === user.uid);
+  const currentPoints = currentUserDoc?.data()?.points ?? 0;
+
+  if (currentPoints < totalCost) {
+    alert("잔여 포인트가 부족합니다. 쿠폰을 발송할 수 없습니다.");
+    return;
+  }
+
+  // 3. 쿠폰 발송
   const batch = selectedCustomers.map(async (c) => {
     await addDoc(collection(db, `users/${user.uid}/loyal_coupons`), {
       customerId: c.id,
@@ -237,7 +252,7 @@ const handleSendCoupons = async () => {
           message || `${c.name}님, 쿠폰 [${couponName}]이 발급되었습니다.`
         );
 
-        await deductPoints(user.uid, 100); // ✅ 문자 전송 성공 시 100원 차감
+        await deductPoints(user.uid, 100);
       } catch (err) {
         console.error(`❌ ${c.name} 문자 실패:`, err);
       }
