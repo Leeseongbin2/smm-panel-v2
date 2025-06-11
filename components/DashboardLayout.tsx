@@ -84,7 +84,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const drawerContent = (
     <Box>
-      <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", p: 2 }}>
+      <Box sx={{ display: "flex", justifyContent: "left", alignItems: "center", p: 2 }}>
         <NextLink href="/dashboard/order" passHref legacyBehavior>
           <a><img src="/logo.png" alt="로고" style={{ width: "130px" }} /></a>
         </NextLink>
@@ -197,7 +197,37 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </ListItem>
         )}
       </List>
+    <Box
+      sx={{
+        position: "absolute",
+        bottom: 16,
+        left: 0,
+        width: "100%",
+        textAlign: "left",
+        fontSize: "0.75rem",
+        color: "#94a3b8",
+        px: 2,
+      }}
+    >
+      <Box sx={{ mb: 0.5 }}>
+        에이치앤비브라더스 대표 이성빈<br />
+        사업자등록번호 592-17-02766<br />
+        주소 경상북도 문경시 신흥5길 1<br />
+        이메일 dltjdqls9565@naver.com<br />
+        대표번호 010-5699-5311
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "left", gap: 1 }}>
+        <NextLink href="/terms" passHref legacyBehavior>
+          <a style={{ color: "#94a3b8", textDecoration: "underline" }}>이용약관</a>
+        </NextLink>
+        <span>|</span>
+        <NextLink href="/privacy" passHref legacyBehavior>
+          <a style={{ color: "#94a3b8", textDecoration: "underline" }}>개인정보 처리방침</a>
+        </NextLink>
+      </Box>
     </Box>
+    </Box>
+    
   );
 
   return (

@@ -212,6 +212,7 @@ export default function AdminTrafficOrders() {
             <TableHead>
               <TableRow>
                 <TableCell>광고유형</TableCell>
+                <TableCell>이메일</TableCell>
                 <TableCell>작업</TableCell>
                 <TableCell>키워드</TableCell>
                 <TableCell>링크</TableCell>
@@ -226,6 +227,7 @@ export default function AdminTrafficOrders() {
               {filtered.map((order) => (
                 <TableRow key={order.id}>
                   <TableCell>{order.adType}</TableCell>
+                  <TableCell>{order.userEmail || "-"}</TableCell>
                   <TableCell>{order.taskType || order.trackingKeyword}</TableCell>
                   <TableCell>{order.keywords}</TableCell>
                   <TableCell>

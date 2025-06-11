@@ -80,38 +80,50 @@ export default function ChargePage() {
     }
   }, [user, userEmail]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const user = auth.currentUser;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  const user = auth.currentUser;
 
-    if (!user) {
-      alert("로그인이 필요합니다.");
-      router.push("/");
-      return;
-    }
+  if (!user) {
+    alert("로그인이 필요합니다.");
+    router.push("/");
+    return;
+  }
 
-    if (!amount || !depositor) {
-      alert("모든 항목을 입력해주세요.");
-      return;
-    }
+  if (!amount || !depositor) {
+    alert("모든 항목을 입력해주세요.");
+    return;
+  }
 
-    try {
-      await addDoc(collection(db, "chargeRequests"), {
-        userId: user.uid,
-        email: user.email,
-        amount: Number(amount),
-        depositor,
-        status: "대기중",
-        createdAt: serverTimestamp(),
+  try {
+    // 🔹 1. Firestore에 충전 요청 저장
+    await addDoc(collection(db, "chargeRequests"), {
+      userId: user.uid,
+      email: user.email,
+      amount: Number(amount),
+      depositor,
+      status: "대기중",
+      createdAt: serverTimestamp(),
+    });
+
+    // 🔹 2. 관리자에게 문자 전송
+      await fetch("/api/send-sms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: "01056995311",
+          content: "신규 포인트 충전 요청",
+        }),
       });
-      alert("💰 충전 요청이 접수되었습니다!");
-      setAmount("");
-      setDepositor("");
-      fetchHistory(user.uid);
-    } catch (err: any) {
-      alert("❌ 오류 발생: " + err.message);
-    }
-  };
+
+    alert("💰 충전 요청이 접수되었습니다!");
+    setAmount("");
+    setDepositor("");
+    fetchHistory(user.uid);
+  } catch (err: any) {
+    alert("❌ 오류 발생: " + err.message);
+  }
+};
 
   return (
     <DashboardLayout>

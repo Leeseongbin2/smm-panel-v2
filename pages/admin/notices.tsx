@@ -1,6 +1,8 @@
+// AdminNoticeEditor.tsx - PDF 업로드 및 다운로드 링크 삽입 추가
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import { db, auth } from "../../lib/firebaseClient";
+import { db, auth, storage } from "../../lib/firebaseClient";
 import {
   doc,
   getDoc,
@@ -10,6 +12,11 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "firebase/storage";
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -17,6 +24,7 @@ import TextStyle from "@tiptap/extension-text-style";
 import Color from "@tiptap/extension-color";
 import Highlight from "@tiptap/extension-highlight";
 import TextAlign from "@tiptap/extension-text-align";
+import Image from "@tiptap/extension-image";
 
 import DashboardLayout from "../../components/DashboardLayout";
 
@@ -60,6 +68,7 @@ export default function AdminNoticeEditor() {
       Color,
       Highlight,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
+      Image,
     ],
     content: "",
     onCreate: () => {
@@ -154,7 +163,6 @@ export default function AdminNoticeEditor() {
           sx={{ mb: 3 }}
         />
 
-        {/* 툴바 */}
         <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
           <Stack direction="row" spacing={1} alignItems="center">
             <IconButton onClick={() => editor.chain().focus().toggleBold().run()}>
@@ -208,28 +216,74 @@ export default function AdminNoticeEditor() {
                 <MenuItem value="Nanum Gothic">나눔고딕</MenuItem>
               </Select>
             </FormControl>
+            <IconButton component="label">
+              📷
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !editor) return;
+                  const reader = new FileReader();
+                  reader.onload = () => {
+                    const base64 = reader.result;
+                    if (typeof base64 === "string") {
+                      editor.chain().focus().setImage({ src: base64 }).run();
+                    }
+                  };
+                  reader.readAsDataURL(file);
+                }}
+              />
+            </IconButton>
+            <IconButton component="label">
+              📄
+              <input
+                type="file"
+                accept="application/pdf"
+                hidden
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file || !editor) return;
+                  const storageRef = ref(storage, `notices/${file.name}`);
+                  await uploadBytes(storageRef, file);
+                  const url = await getDownloadURL(storageRef);
+                  editor.commands.insertContent(
+                    `<p><a href="${url}" download target="_blank">📄 ${file.name} 다운로드</a></p>`
+                  );
+                }}
+              />
+            </IconButton>
           </Stack>
         </Paper>
 
-        {/* 에디터 */}
         <Paper variant="outlined" sx={{ p: 2 }}>
-        <Box
+          <Box
             onClick={() => editor?.commands.focus()}
             sx={{
-            minHeight: 300,
-            cursor: "text",
-            "& .ProseMirror": {
+              minHeight: 300,
+              cursor: "text",
+              "& .ProseMirror": {
                 outline: "none",
-                lineHeight: "0.7", // ✅ 줄 간격
+                lineHeight: "0.7",
                 p: {
-                margin: "0 0 8px 0", // ✅ 문단 간 여백 (위: 0px, 아래: 8px)
+                  margin: "0 0 8px 0",
                 },
-            },
+                img: {
+                  width: 'auto !important',
+                  maxWidth: '100% !important',
+                  height: 'auto !important',
+                  display: 'block',
+                  margin: '12px auto',
+                  borderRadius: '8px',
+                }
+              },
             }}
-        >
+          >
             <EditorContent editor={editor} />
-        </Box>
+          </Box>
         </Paper>
+
         <Button variant="contained" sx={{ mt: 3 }} onClick={handleSave}>
           {id ? "수정 완료" : "작성 완료"}
         </Button>

@@ -142,6 +142,16 @@ export default function TrafficOrderPage() {
       await updateDoc(userRef, { points: newPoints });
       setUserPoints(newPoints);
 
+      // ✅ 문자 발송 (관리자에게)
+      await fetch("/api/send-sms", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          to: "01056995311",
+          content: "신규주문 등록",
+        }),
+      });
+
       alert("✅ 신청이 접수되었습니다.");
     } catch (error) {
       console.error("신청 중 오류:", error);

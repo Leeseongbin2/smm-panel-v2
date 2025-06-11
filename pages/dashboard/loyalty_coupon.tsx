@@ -6,12 +6,13 @@ import {
 } from "@mui/material";
 import { db } from "@/lib/firebaseClient";
 import {
-  collection, getDocs, updateDoc, deleteDoc, doc, addDoc
+  collection, getDocs, updateDoc, deleteDoc, doc, addDoc,increment
 } from "firebase/firestore";
 import { useUserContext } from "@/context/UserContext";
 import DashboardLayout from "@/components/DashboardLayout";
 import dayjs from "dayjs";
 import { Timestamp } from "firebase/firestore";
+import { sendSms } from "@/lib/sendSms";
 
 export default function LoyaltyCouponsPage() {
   const { user } = useUserContext();
@@ -53,7 +54,12 @@ export default function LoyaltyCouponsPage() {
     }
     return birthday.diff(today, "day");
     };
-
+  const deductPoints = async (uid: string, amount: number) => {
+  const userRef = doc(db, `users/${uid}`);
+  await updateDoc(userRef, {
+    points: increment(-amount),
+  });
+  };
   const calculateDday = (dateStr: string) => {
     if (!dateStr) return "-";
     const today = dayjs();
@@ -188,28 +194,63 @@ if (sortType === "birth") {
     closeConfirmDialog();
   };
 
-  const handleSendCoupons = async () => {
-    if (!user) return;
-    const selectedCustomers = customers.filter(c => selectedCustomerIds.includes(c.id));
-    const batch = selectedCustomers.map(c =>
-      addDoc(collection(db, `users/${user.uid}/loyal_coupons`), {
-        customerId: c.id,
-        customerName: c.name,
-        couponName,
-        startDate: startDate.format("YYYY-MM-DD"),
-        expireDate: endDate.format("YYYY-MM-DD"),
-        message,
-        status: "unused",
-        createdAt: new Date(),
-      })
-    );
-    await Promise.all(batch);
-    await fetchCoupons();
-    alert("쿠폰이 발송되었습니다.");
-    setSendDialogOpen(false);
-    setCouponName("");
-    setMessage("");
-  };
+  const sendSmsFromClient = async (to: string, content: string) => {
+  try {
+    const res = await fetch("/api/send-sms", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ to, content }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.success) {
+      throw new Error(data.error || "문자 전송에 실패했습니다.");
+    }
+
+    console.log("✅ 문자 전송 성공:", data.result);
+  } catch (err) {
+    console.error("❌ 문자 전송 중 오류:", err);
+    throw err;
+  }
+};
+const handleSendCoupons = async () => {
+  if (!user) return;
+  const selectedCustomers = customers.filter(c => selectedCustomerIds.includes(c.id));
+
+  const batch = selectedCustomers.map(async (c) => {
+    await addDoc(collection(db, `users/${user.uid}/loyal_coupons`), {
+      customerId: c.id,
+      customerName: c.name,
+      couponName,
+      startDate: startDate.format("YYYY-MM-DD"),
+      expireDate: endDate.format("YYYY-MM-DD"),
+      message,
+      status: "unused",
+      createdAt: new Date(),
+    });
+
+    if (c.phone) {
+      try {
+        await sendSmsFromClient(
+          c.phone,
+          message || `${c.name}님, 쿠폰 [${couponName}]이 발급되었습니다.`
+        );
+
+        await deductPoints(user.uid, 100); // ✅ 문자 전송 성공 시 100원 차감
+      } catch (err) {
+        console.error(`❌ ${c.name} 문자 실패:`, err);
+      }
+    }
+  });
+
+  await Promise.all(batch);
+  await fetchCoupons();
+  alert("쿠폰이 발송되었습니다.");
+  setSendDialogOpen(false);
+  setCouponName("");
+  setMessage("");
+};
 
     const handleDeleteSelectedCustomers = async () => {
     if (!user?.uid) return;
