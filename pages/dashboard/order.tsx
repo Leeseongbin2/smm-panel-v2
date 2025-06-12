@@ -195,7 +195,7 @@ export default function OrderPage() {
   const categoryOrder = Array.from(new Set(services.map((svc) => svc.category)));
   const uniqueCategories = ["전체", ...categoryOrder];
   const filteredServices = services.filter((s: any) => category === "전체" || s.category === category);
-  const formattedPrice = (v: number) => (v < 1 ? v.toFixed(1) : Math.round(v).toString());
+  const formattedPrice = (v: number) => Number.isInteger(v) ? v.toString() : v.toFixed(1);
   const requiredAmount = totalPrice - (userPoints || 0) > 0 ? (totalPrice - (userPoints || 0)) : 0;
 
   return (
