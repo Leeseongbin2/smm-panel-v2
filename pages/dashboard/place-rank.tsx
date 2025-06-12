@@ -202,13 +202,19 @@ const transformedData = (() => {
         <Typography variant="h4" gutterBottom>
           플레이스 순위 추적
         </Typography>
-            <Alert severity="info" sx={{ mb: 3 }}>
-      <strong>📢 플레이스 순위 조회 안내</strong><br />
-      - 순위 데이터는 <strong>최대 60일간 보관</strong>되며 이후 자동 삭제됩니다.<br />
-      - 조회 후 결과 반영까지 <strong>30초~60초</strong>정도가 소요될 수 있습니다.<br />
-      - 간혹 <strong>90~100위 이상의 비정상 순위</strong>가 표시될 수 있습니다.<br />
-      &nbsp;&nbsp;→ 이 경우 <strong>재조회 버튼</strong>을 클릭하거나, 다른 업체 조회 후 다시 시도해 주세요.
-    </Alert>
+          <Alert severity="info" sx={{ mb: 3 }}>
+            <strong>📢 플레이스 순위 조회 안내</strong><br />
+            - 순위 데이터는 <strong>최대 60일간 보관</strong>되며 이후 자동 삭제됩니다.<br />
+            - 조회 후 결과 반영까지 <strong>30초~60초</strong> 정도가 소요될 수 있습니다.<br />
+             →새로고침을 누르거나, 페이지를 나가지 말고 기다려주세요.<br />
+             <br />
+            🔍 <strong>MID는 무엇인가요?</strong><br />
+            - MID는 네이버 플레이스 링크에 포함된 업체 고유 번호입니다.<br />
+            - 예: <span style={{ backgroundColor: "#f0f0f0", padding: "2px 4px", borderRadius: "4px" }}>
+              https://map.naver.com/p/entry/place/<strong style={{ color: "#1976d2" }}>1686970821</strong>
+            </span><br />
+            - 이 링크에서 <strong style={{ color: "#1976d2" }}>1686970821</strong> 이 바로 MID입니다. 대표님 업체 플레이스 URL중 해당 숫자만 복사해 입력해 주세요.
+          </Alert>
         <Box display="flex" flexDirection={isMobile ? "column" : "row"} gap={2} mb={4}>
           <TextField label="업체명" value={name} onChange={(e) => setName(e.target.value)} fullWidth />
           <TextField label="키워드" value={keyword} onChange={(e) => setKeyword(e.target.value)} fullWidth />

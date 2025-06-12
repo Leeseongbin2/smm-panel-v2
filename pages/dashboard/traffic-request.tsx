@@ -15,6 +15,7 @@ import {
   Grid,
   Paper,
   Chip,
+  Alert,
   useMediaQuery,
 } from "@mui/material";
 import DashboardLayout from "../../components/DashboardLayout";
@@ -162,14 +163,31 @@ export default function TrafficOrderPage() {
   return (
     <DashboardLayout>
       <Container maxWidth="md" sx={{ py: 4 }}>
-        <Paper sx={{ p: 2, mb: 3, backgroundColor: "#f5f5f5" }}>
-          <Typography variant="h6" gutterBottom>📢 필독 공지</Typography>
-          <Typography variant="body2" gutterBottom>⚠️ 트래픽을 포함한 리워드 작업 가격은 항시 변동될 수 있으니 현재 가격표를 확인해주세요.</Typography>
-          <Typography variant="body2" gutterBottom>🔎 '키워드'란 검색어를 의미합니다. 해당 플레이스가 5위 이내 나오는 키워드 최소 3개~최대 6개까지 입력가능합니다.</Typography>
-          <Typography variant="body2" gutterBottom>📆 리워드 작업은 네이버 로직 특성상 권장시기가 있고 비권장 시기가 있습니다. 꼭 시기를 확인 후 참고하여 주문 바랍니다.</Typography>
-          <Typography variant="body2" gutterBottom>🚫 본 작업은 '순위보장형'이 아닙니다. 다만 순위가 오르지 않을 시기에는 미리 해당 페이지에서 알려드리도록 하겠습니다.</Typography>
-          <Typography variant="body2">💬 궁금한 사항은 우측 하단 카카오톡 문의 버튼을 클릭하시어 문의주세요. 하나부터 열까지 친절하고 정확하게 알려드리겠습니다.</Typography>
-        </Paper>
+        <Alert severity="warning" sx={{ mb: 3, p: 2, lineHeight: 1.8 }}>
+          <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>📢 필독 공지</Typography>
+
+          <Typography variant="body2" sx={{ mb: 1.5 }}>
+            - 트래픽을 포함한 리워드 작업 가격은 <strong>항시 변동</strong>될 수 있으니, <strong>현재 가격표</strong>를 꼭 확인해주세요.
+          </Typography>
+
+          <Typography variant="body2" sx={{ mb: 1.5 }}>
+            - <strong>'키워드'</strong>란 검색어를 의미합니다. 해당 플레이스가 <strong>5위 이내에 나오는 키워드</strong>를 최소 3개~최대 6개까지 입력 가능합니다.
+          </Typography>
+
+          <Typography variant="body2" sx={{ mb: 1.5 }}>
+            - 리워드 작업은 네이버 로직 특성상 <strong>권장 시기</strong>와 <strong>비권장 시기</strong>가 존재합니다. 꼭 시기를 확인하신 후 주문 바랍니다.
+          </Typography>
+
+          <Typography variant="body2" sx={{ mb: 1.5 }}>
+            - 본 작업은 <strong>'순위보장형'</strong>이 아닙니다. 단, 순위 상승이 어려운 시기에는 미리 해당 페이지를 통해 안내드리겠습니다.
+          </Typography>
+
+          <Typography variant="body2">
+            💬 <strong>작업량, 신청 방법 등 자세한 설명이 필요하신 경우</strong><br />
+            → <strong style={{ color: "#1976d2" }}>망설이지 말고 우측 하단의 카카오톡 문의 버튼</strong>을 클릭해주세요.
+            하나부터 열까지 <strong>친절하고 정확하게</strong> 안내드리겠습니다 😊
+          </Typography>
+        </Alert>
 
         {/* 가격 / 시기 안내 */}
         {pricing && (
