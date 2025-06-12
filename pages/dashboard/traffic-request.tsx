@@ -109,6 +109,13 @@ export default function TrafficOrderPage() {
     }
   }
 
+    const taskLabelMap: Record<string, string> = {
+      traffic: "트래픽 유입",
+      save: "저장",
+      share: "공유",
+      rank: "상위 노출 트래픽",
+    };
+
   const totalPrice = dailyTraffic * totalDays * unitPrice;
 
   const handleSubmit = async () => {
@@ -227,9 +234,9 @@ export default function TrafficOrderPage() {
                           <TextField
                             key={taskKey}
                             fullWidth
-                            label={`${taskKey} 가격`}
+                            label={`${taskLabelMap[taskKey] ?? taskKey} 가격`}  // ✅ 한글 라벨 적용
                             type="number"
-                            value={pricing[type].prices[taskKey as keyof typeof pricing[typeof type]["prices"]]} // <- 명시적으로 단언
+                            value={pricing[type].prices[taskKey as keyof typeof pricing[typeof type]["prices"]]}
                             onChange={(e) =>
                               setPricing({
                                 ...pricing,
@@ -247,11 +254,14 @@ export default function TrafficOrderPage() {
                         ))}
                       </>
                     ) : (
-                      <Box display="flex" gap={2} flexWrap="wrap">
-                        {Object.entries(pricing[type].prices).map(([k, v]) => (
-                          <Typography variant="body2" key={k}>{k}: {v}원</Typography>
+                      <Typography variant="body2">
+                        {Object.entries(pricing[type].prices).map(([k, v], idx, arr) => (
+                          <span key={k}>
+                            {taskLabelMap[k] ?? k}: {v.toLocaleString()}원
+                            {idx < arr.length - 1 && " / "}
+                          </span>
                         ))}
-                      </Box>
+                      </Typography>
                     )}
                   </Box>
                 </Grid>
@@ -280,13 +290,16 @@ export default function TrafficOrderPage() {
           <Grid item xs={12} sm={6}>
             <FormControl fullWidth>
               <InputLabel>세부작업</InputLabel>
-              <Select value={taskType} onChange={(e) => setTaskType(e.target.value as TaskType)}>
-                {adType === "place" && ["traffic", "save", "share"].map((task) => (
-                  <MenuItem key={task} value={task}>{task}</MenuItem>
-                ))}
-                {adType === "tmap" && <MenuItem value="rank">rank</MenuItem>}
-                {adType === "kakaomap" && <MenuItem value="rank">rank</MenuItem>}
-              </Select>
+                <Select value={taskType} onChange={(e) => setTaskType(e.target.value as TaskType)}>
+                  {adType === "place" &&
+                      (["traffic", "save", "share"] as PlaceTask[]).map((task) => (
+                        <MenuItem key={task} value={task}>
+                          {taskLabelMap[task]}
+                        </MenuItem>
+                      ))}
+                  {adType === "tmap" && <MenuItem value="rank">상위 노출 트래픽</MenuItem>}
+                  {adType === "kakaomap" && <MenuItem value="rank">상위 노출 트래픽</MenuItem>}
+                </Select>
             </FormControl>
           </Grid>
           <Grid item xs={12}><TextField fullWidth label="키워드" value={keywords} onChange={(e) => setKeywords(e.target.value)} /></Grid>
